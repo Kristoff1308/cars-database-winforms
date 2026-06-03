@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
-using System.Data.SQLite;
 using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using CarsClassLibrary;
 
 namespace CarsDatabase
 {
@@ -13,6 +12,8 @@ namespace CarsDatabase
         string dbFileName = Application.StartupPath + @"\Hire.db";
         DataTable carsTable = new DataTable();
         int currentIndex = 0;
+        frmSearch searchForm;
+        SQLiteManager sqliteManager;
 
         public frmCars()
         {
@@ -23,7 +24,8 @@ namespace CarsDatabase
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-IE");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-IE");
-            this.Text = "Task A Search Krzysztof Kaminski 29/05/2026";
+            this.Text = "Task A Krzysztof Kaminski 08/06/2026";
+            sqliteManager = new SQLiteManager(dbFileName);
             LoadCars();
             if (carsTable.Rows.Count > 0)
             {
@@ -35,23 +37,14 @@ namespace CarsDatabase
             toolTip1.SetToolTip(txtRentalPerDay, "Enter the rental price per day");
         }
 
-        private string GetConnectionString()
-        {
-            return "Data Source=" + dbFileName + ";Version=3;";
-        }
 
         private void LoadCars()
         {
             try
             {
-                SQLiteConnection connection = new SQLiteConnection(GetConnectionString());
-                connection.Open();
                 string sqlQuery = "SELECT * FROM tblCar";
-                SQLiteCommand command = new SQLiteCommand(sqlQuery, connection);
-                SQLiteDataReader dataReader = command.ExecuteReader();
-                carsTable = new DataTable();
-                carsTable.Load(dataReader);
-                connection.Close();
+                sqliteManager.SQLQuery = sqlQuery;
+                carsTable = sqliteManager.ReadData();
             }
             catch (Exception ex)
             {
@@ -67,12 +60,10 @@ namespace CarsDatabase
                 txtRecordCount.Text = "0 of 0";
                 return;
             }
-
             DataRow row = carsTable.Rows[currentIndex];
-
             txtVehicleRegNo.Text = row["VehicleRegNo"].ToString();
             txtMake.Text = row["Make"].ToString();
-            txtEngineSize.Text = row["EngineSize"].ToString();
+            txtEngineSize.Text = Convert.ToDouble(row["EngineSize"]).ToString("0.0");
             dtpDateRegistered.Value = Convert.ToDateTime(row["DateRegistered"]);
             txtRentalPerDay.Text = Convert.ToDecimal(row["RentalPerDay"]).ToString("0.00");
             chkAvailable.Checked = Convert.ToBoolean(row["Available"]);
@@ -132,54 +123,48 @@ namespace CarsDatabase
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            try
-            {
-                SQLiteConnection connection = new SQLiteConnection(GetConnectionString());
-                connection.Open();
-                string sqlQuery = "INSERT INTO tblCar " + "(VehicleRegNo, Make, EngineSize, DateRegistered, RentalPerDay, Available) " + "VALUES " + "(@VehicleRegNo, @Make, @EngineSize, @DateRegistered, @RentalPerDay, @Available)";
-                SQLiteCommand command = new SQLiteCommand(sqlQuery, connection);
-                command.Parameters.AddWithValue("@VehicleRegNo", txtVehicleRegNo.Text);
-                command.Parameters.AddWithValue("@Make", txtMake.Text);
-                command.Parameters.AddWithValue("@EngineSize", txtEngineSize.Text);
-                command.Parameters.AddWithValue("@DateRegistered", dtpDateRegistered.Value.ToString("dd/MM/yyyy"));
-                command.Parameters.AddWithValue("@RentalPerDay", Convert.ToDecimal(txtRentalPerDay.Text));
-                command.Parameters.AddWithValue("@Available", chkAvailable.Checked);
-                command.ExecuteNonQuery();
-                connection.Close();
-                MessageBox.Show("Record added");
+           
+                Car car = new Car();
+                car.VehicleRegNo = txtVehicleRegNo.Text;
+                car.Make = txtMake.Text;
+                car.EngineSize = Convert.ToDouble(txtEngineSize.Text);
+            car.DateRegistered = dtpDateRegistered.Value; 
+                car.RentalPerDay = Convert.ToDecimal(txtRentalPerDay.Text);
+                car.Available = chkAvailable.Checked;
+                bool added = sqliteManager.AddRecord(car);
+                if (added)
+                {
+                MessageBox.Show("Record Added");
                 LoadCars();
-                currentIndex = carsTable.Rows.Count - 1;
-                DisplayCar();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Add error: " + ex.Message);
-            }
+                    currentIndex = carsTable.Rows.Count - 1;
+                    DisplayCar();
+                }
+                else
+                {
+                    MessageBox.Show("Add error");
+                }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            try
+            Car car = new Car();
+            car.ID = Convert.ToInt32(carsTable.Rows[currentIndex]["ID"]);
+            car.VehicleRegNo = txtVehicleRegNo.Text;
+            car.Make = txtMake.Text;
+            car.EngineSize = Convert.ToDouble(txtEngineSize.Text);
+            car.DateRegistered = dtpDateRegistered.Value;
+            car.RentalPerDay = Convert.ToDecimal(txtRentalPerDay.Text);
+            car.Available = chkAvailable.Checked;
+            bool updated = sqliteManager.UpdateRecord(car);
+            if (updated)
             {
-                SQLiteConnection connection = new SQLiteConnection(GetConnectionString());
-                connection.Open();
-                string sqlQuery = "UPDATE tblCar SET " + "Make = @Make, " + "EngineSize = @EngineSize, " +"DateRegistered = @DateRegistered, " + "RentalPerDay = @RentalPerDay, " + "Available = @Available " +"WHERE VehicleRegNo = @VehicleRegNo";
-                SQLiteCommand command = new SQLiteCommand(sqlQuery, connection);
-                command.Parameters.AddWithValue("@VehicleRegNo", txtVehicleRegNo.Text);
-                command.Parameters.AddWithValue("@Make", txtMake.Text);
-                command.Parameters.AddWithValue("@EngineSize", txtEngineSize.Text);
-                command.Parameters.AddWithValue("@DateRegistered", dtpDateRegistered.Value.ToString("dd/MM/yyyy"));
-                command.Parameters.AddWithValue("@RentalPerDay", Convert.ToDecimal(txtRentalPerDay.Text));
-                command.Parameters.AddWithValue("@Available", chkAvailable.Checked);
-                command.ExecuteNonQuery();
-                connection.Close();
                 MessageBox.Show("Record updated");
                 LoadCars();
                 DisplayCar();
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Update error: " + ex.Message);
+                MessageBox.Show("Update error");
             }
         }
 
@@ -188,15 +173,10 @@ namespace CarsDatabase
             DialogResult answer = MessageBox.Show("Delete this record?","Delete",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
             if (answer == DialogResult.Yes)
             {
-                try
+                int id = Convert.ToInt32(carsTable.Rows[currentIndex]["ID"]);
+                bool deleted = sqliteManager.DeleteRecord(id);
+                if (deleted)
                 {
-                    SQLiteConnection connection = new SQLiteConnection(GetConnectionString());
-                    connection.Open();
-                    string sqlQuery = "DELETE FROM tblCar WHERE VehicleRegNo = @VehicleRegNo";
-                    SQLiteCommand command = new SQLiteCommand(sqlQuery, connection);
-                    command.Parameters.AddWithValue("@VehicleRegNo", txtVehicleRegNo.Text);
-                    command.ExecuteNonQuery();
-                    connection.Close();
                     MessageBox.Show("Record deleted");
                     LoadCars();
                     if (carsTable.Rows.Count > 0)
@@ -209,32 +189,32 @@ namespace CarsDatabase
                     }
                     else
                     {
-                        currentIndex = 0;
-                        txtVehicleRegNo.Clear();
-                        txtMake.Clear();
-                        txtEngineSize.Clear();
-                        txtRentalPerDay.Clear();
-                        chkAvailable.Checked = false;
+                        ClearTextBoxes();
+                        txtRecordCount.Text = "0 of 0";
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show("Delete error: " + ex.Message);
+                    MessageBox.Show("Delete error");
                 }
             }
         }
-        
-        
+
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            LoadCars();
             DisplayCar();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            frmSearch searchForm = new frmSearch();
+            if (searchForm == null || searchForm.IsDisposed)
+            {
+                searchForm = new frmSearch();
+            }
 
-            searchForm.ShowDialog();
+            searchForm.Show();
+            searchForm.BringToFront();
         }
 
         private void btnExit_Click(object sender, EventArgs e)

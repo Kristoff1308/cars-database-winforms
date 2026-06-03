@@ -125,21 +125,21 @@
             this.txtMake.Location = new System.Drawing.Point(192, 118);
             this.txtMake.Name = "txtMake";
             this.txtMake.Size = new System.Drawing.Size(243, 20);
-            this.txtMake.TabIndex = 7;
+            this.txtMake.TabIndex = 1;
             // 
             // txtEngineSize
             // 
             this.txtEngineSize.Location = new System.Drawing.Point(192, 147);
             this.txtEngineSize.Name = "txtEngineSize";
             this.txtEngineSize.Size = new System.Drawing.Size(135, 20);
-            this.txtEngineSize.TabIndex = 8;
+            this.txtEngineSize.TabIndex = 2;
             // 
             // txtRentalPerDay
             // 
             this.txtRentalPerDay.Location = new System.Drawing.Point(192, 215);
             this.txtRentalPerDay.Name = "txtRentalPerDay";
             this.txtRentalPerDay.Size = new System.Drawing.Size(135, 20);
-            this.txtRentalPerDay.TabIndex = 10;
+            this.txtRentalPerDay.TabIndex = 4;
             // 
             // btnFirst
             // 
@@ -204,7 +204,7 @@
             this.chkAvailable.Location = new System.Drawing.Point(192, 252);
             this.chkAvailable.Name = "chkAvailable";
             this.chkAvailable.Size = new System.Drawing.Size(15, 14);
-            this.chkAvailable.TabIndex = 17;
+            this.chkAvailable.TabIndex = 5;
             this.chkAvailable.UseVisualStyleBackColor = true;
             // 
             // btnUpdate
@@ -284,7 +284,7 @@
             this.txtVehicleRegNo.Location = new System.Drawing.Point(192, 90);
             this.txtVehicleRegNo.Name = "txtVehicleRegNo";
             this.txtVehicleRegNo.Size = new System.Drawing.Size(135, 20);
-            this.txtVehicleRegNo.TabIndex = 24;
+            this.txtVehicleRegNo.TabIndex = 0;
             // 
             // dtpDateRegistered
             // 
@@ -293,8 +293,8 @@
             this.dtpDateRegistered.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpDateRegistered.Location = new System.Drawing.Point(192, 180);
             this.dtpDateRegistered.Name = "dtpDateRegistered";
-            this.dtpDateRegistered.Size = new System.Drawing.Size(135, 20);
-            this.dtpDateRegistered.TabIndex = 25;
+            this.dtpDateRegistered.Size = new System.Drawing.Size(117, 20);
+            this.dtpDateRegistered.TabIndex = 3;
             // 
             // frmCars
             // 
@@ -329,7 +329,7 @@
             this.Controls.Add(this.lblHeading);
             this.Name = "frmCars";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Task A Krzysztof Kaminski 20/05/2026";
+            this.Text = "Task A Krzysztof Kaminski 08/06/2026";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmCars_FormClosing);
             this.Load += new System.EventHandler(this.frmCars_Load);
             this.ResumeLayout(false);

@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../CarsClassLibrary/CarsClassLibrary.csproj" Id="7efda2e4-d7ee-493a-9f4e-d95ca2eb84ce" />
   <Project Path="CarsDatabase.csproj" Id="9c31ec97-9cb4-43ef-97e2-aed850cf9491" />
 </Solution>
