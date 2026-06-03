@@ -141,8 +141,8 @@ namespace CarsDatabase
                 }
                 else
                 {
-                    MessageBox.Show("Add error");
-                }
+                MessageBox.Show("Add error: record was not added");
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
